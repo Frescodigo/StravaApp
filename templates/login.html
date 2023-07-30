@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="window flexbox-container">
+        <div class="window-header flexbox-item">
+            <h1>
+                Welcome to Brick x Brick
+            </h1>
+        </div>
+        <div class="window-body flexbox-item">
+            <p>
+                Click the button below to link your Strava profile and start smashing goals!
+            </p>
+						<a href="http://www.strava.com/oauth/authorize?client_id=100993&response_type=code&redirect_uri={{ app_url }}/exchange_token&approval_prompt=force&scope=activity:read_all">
+                <button id="login-btn"><span>Log in with Strava</span></button>
+            </a>
+        </div>
+    </div>
+{% endblock %}

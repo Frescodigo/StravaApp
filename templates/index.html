@@ -1,8 +1,67 @@
 {% extends "layout.html" %}
 
+
 {% block body %}
-    <form action="/greet" method="get">
-        <input name="name" placeholder="Name" type="text">
-        <button type="submit">Greet</button>
-    </form>
-{% endblock body %}
+    <header>
+        <h1>Welcome back, {{athlete.firstname}} {{athlete.lastname}}</h1>
+        <a class="logout-button" href="/login">Log out</a>
+    </header>
+
+    <main>
+        <div class="window">
+            <section>
+                <h2>This week's activities:</h2>
+                <ul class="carousel">
+                    {% for activity in activities %}
+                    <div class="carousel-item">
+                        <li>
+                            <h3>{{activity.name}}</h3>
+                            <p>{{activity.start_date_local}}</p>
+                            <p>{{activity.moving_time|s_to_min}}</p>
+                            <p>{{activity.distance|m_to_mi|round(1)}}</p>
+                            <p>{{activity.total_elevation_gain|m_to_ft|round(1)}}</p>
+                        </li>
+                    </div>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <section>
+                <h2>This week's goals:</h2>
+                <table>
+                    <tbody>
+                        {% for goal in goals %}
+                        <tr>
+                            <td> {{ goal.category|capitalize }} </th>
+                            <td> {{ goal.time_span }} </td>
+                            <td>
+                                <meter id={{goal.id}}-meter max="0" min="0" value="0">[[change with js]]</meter>
+                                <label class="meter-label" for={{goal.id}}-meter id={{goal.id}}-meter-label> ADD JS PLS :pleading: </label>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <h3>Add a goal for this week:</h3>
+                <form action="/addgoal" method="post">
+                    <select name="category" id="category">
+                        {% for category in categories %}
+                        <option value={{category}}>{{ category.capitalize() }}</option>
+                        {% endfor %}
+                    </select>
+                    <input id="objective" type="number" name="objective" autocomplete="off" min="0" max="99999" required>
+                    <label for="objective" id="unit-label">UNITS</label>
+                    <select name="time-span" id="time-span">
+                        {% for time_span in time_spans %}
+                        <option value={{time_span}}>{{ time_span.replace("-"," ") }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Add goal</button>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <script src="/static/goals.js"></script>
+{% endblock %}
