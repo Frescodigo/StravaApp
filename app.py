@@ -31,9 +31,6 @@ if not CLIENT_SECRET:
 # API variables
 token_url = "https://www.strava.com/oauth/token"
 APP_URL = "http://127.0.0.1:5000"
-# CLIENT_ID = 100993
-# CLIENT_SECRET = "e79f1196ee2c0d7b0021b619a97dc3a94f1f5a3d"
-
 
 # Show run activity/goals if logged in, send to login otherwise
 @app.route("/")
@@ -87,3 +84,4 @@ def get_activities():
     header = {'Authorization': 'Bearer ' + session.get('user')['access_token']}
     result = requests.get(activities_url, headers=header).json()
     return [i for i in result if i['type'] == 'Run']
+
