@@ -2,6 +2,7 @@ import sqlite3
 from flask import Flask, jsonify, render_template, redirect, request, session, url_for
 from flask_session import Session
 from helpers import calc_objective, login_required, m_to_ft, m_to_mi, start_of_week, s_to_min, update_goals
+import os
 import requests
 
 # Configure app
@@ -16,11 +17,22 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+# Configure environment variables 
+CLIENT_ID = os.environ.get("STRAVA_CLIENT_ID")
+if not CLIENT_ID:
+    print("Environment variable 'STRAVA_CLIENT_ID' not set")
+    quit()
+
+CLIENT_SECRET = os.environ.get("STRAVA_CLIENT_SECRET")
+if not CLIENT_SECRET:
+    print("Environment variable 'STRAVA_CLIENT_SECRET' not set")
+    quit()
+
 # API variables
 token_url = "https://www.strava.com/oauth/token"
-CLIENT_ID = 100993
-CLIENT_SECRET = "e79f1196ee2c0d7b0021b619a97dc3a94f1f5a3d"
 APP_URL = "http://127.0.0.1:5000"
+# CLIENT_ID = 100993
+# CLIENT_SECRET = "e79f1196ee2c0d7b0021b619a97dc3a94f1f5a3d"
 
 
 # Show run activity/goals if logged in, send to login otherwise
@@ -43,7 +55,6 @@ def index():
     # Download Activities from Strava's API
     activities = get_activities()
 
-    print(activities[0])
     return render_template("index.html", activities=activities)
 
 
