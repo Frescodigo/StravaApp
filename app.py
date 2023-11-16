@@ -1,12 +1,14 @@
 import sqlite3
 from flask import Flask, jsonify, render_template, redirect, request, session, url_for
 from flask_session import Session
-from helpers import calc_objective, login_required, m_to_ft, m_to_mi, start_of_week, s_to_min, update_goals
+from helpers import calc_objective, login_required, m_to_mi, human_readable_datetime
 import os
 import requests
 
 # Configure app
 app = Flask(__name__)
+app.jinja_env.filters['m_to_mi'] = m_to_mi
+app.jinja_env.filters['time'] = human_readable_datetime
 
 # Configure db
 db_con = sqlite3.connect("goals.db")
@@ -46,13 +48,17 @@ def index():
         'grant_type': 'refresh_token',
         'refresh_token': session.get('user')['refresh_token']
     }
+
     res = requests.post(token_url, data=data).json()
     session['user']['access_token'] = res['access_token']
+
+    # Get Athlete info from Strava's API
+    athlete = get_athlete()
 
     # Download Activities from Strava's API
     activities = get_activities()
 
-    return render_template("index.html", activities=activities)
+    return render_template("index.html", athlete=athlete, activities=activities)
 
 
 # Log user in
@@ -64,7 +70,6 @@ def login():
 # Generate an access token
 @app.route("/exchange_token")
 def get_token():
-    print('yippy')
     session["authorization-code"] = request.args.get("code")
     data = {
         'client_id': CLIENT_ID,
@@ -83,5 +88,14 @@ def get_activities():
     activities_url = "https://www.strava.com/api/v3/athlete/activities"
     header = {'Authorization': 'Bearer ' + session.get('user')['access_token']}
     result = requests.get(activities_url, headers=header).json()
+
     return [i for i in result if i['type'] == 'Run']
 
+# Get athlete data
+@app.route("/athlete")
+@login_required
+def get_athlete():
+    athlete_url = "https://www.strava.com/api/v3/athlete"
+    header = {'Authorization': 'Bearer ' + session.get('user')['access_token']}
+    result = requests.get(athlete_url, headers=header).json()
+    return result

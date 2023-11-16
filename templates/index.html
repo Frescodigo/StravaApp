@@ -2,17 +2,19 @@
 
 
 {% block body %}
-<p>Logged in, finally</p>
+<h1>Welcome, {{ athlete["firstname"]}}</h1>
+<a href="/login">Sign out?</a>
 <section>
-  <h1>Your activities</h1>
+  <h2>Your activities</h2>
   <ul>
     {% for activity in activities %}
     <li>
       <article>
-        <h2>{{ activity['name'] }}</h2>
+        <h3>{{ activity['name'] }}</h3>
         <!-- DATE -->
-        <!-- DESCRIPTION -->
+        <time><p>{{ activity['start_date_local'] | time }}</p></time>
         <!-- DISTANCE -->
+        <p>{{ activity['distance'] | m_to_mi | round(2) }} mi</p>
         <!-- PACE -->
         <!-- DURATION -->
         <!-- ELEVATION -->
