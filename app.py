@@ -1,7 +1,7 @@
 import sqlite3
 from flask import Flask, jsonify, render_template, redirect, request, session, url_for
 from flask_session import Session
-from helpers import calc_objective, login_required, m_to_mi, human_readable_datetime
+from helpers import calc_objective, login_required, m_to_mi, human_readable_datetime, sunday_from_a_year_ago
 import os
 import requests
 
@@ -30,9 +30,15 @@ if not CLIENT_SECRET:
     print("Environment variable 'STRAVA_CLIENT_SECRET' not set")
     quit()
 
+# TODO: Get a real host address
+APP_IP = os.environ.get("STRAVA_APP_IP") # Debug only, I think
+if not APP_IP:
+    print("Environment variable 'STRAVA_APP_IP' not set")
+    quit()
+
 # API variables
 token_url = "https://www.strava.com/oauth/token"
-APP_URL = "http://127.0.0.1:5000"
+APP_URL = "http://" + APP_IP + ":5000"
 
 # Show run activity/goals if logged in, send to login otherwise
 @app.route("/")
@@ -51,6 +57,7 @@ def index():
 
     res = requests.post(token_url, data=data).json()
     session['user']['access_token'] = res['access_token']
+    session['user']['time_zone'] = res
 
     # Get Athlete info from Strava's API
     athlete = get_athlete()
@@ -87,9 +94,11 @@ def get_token():
 def get_activities():
     activities_url = "https://www.strava.com/api/v3/athlete/activities"
     header = {'Authorization': 'Bearer ' + session.get('user')['access_token']}
+    print(sunday_from_a_year_ago())
     result = requests.get(activities_url, headers=header).json()
 
-    return [i for i in result if i['type'] == 'Run']
+    return [i for i in result if i['type'] == 'Run']  
+
 
 # Get athlete data
 @app.route("/athlete")
@@ -99,3 +108,6 @@ def get_athlete():
     header = {'Authorization': 'Bearer ' + session.get('user')['access_token']}
     result = requests.get(athlete_url, headers=header).json()
     return result
+
+if __name__ == '__main__':
+    app.run(host=APP_IP, debug=True)  
