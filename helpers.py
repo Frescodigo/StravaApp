@@ -44,10 +44,12 @@ def human_readable_datetime(value):
     # format should be like "Nov 15, 2023 @ 10:20"
     return dateutil.parser.isoparse(value).strftime("%b %d, %Y @ %I:%M%p")
 
+
 # Returns the date of sunday from a year ago in EPOCH
-def sunday_from_a_year_ago():
-    today = datetime.today()
-    timezone = pytz.timezone('US/Eastern')
-    sunday_a_year_ago = datetime(today.year - 1, today.month, today.day - today.weekday())
-    print(sunday_a_year_ago)
-    return calendar.timegm(sunday_a_year_ago.timetuple())
+# Sidenote: probably useless
+# def sunday_from_a_year_ago():
+#     today = datetime.today()
+#     timezone = pytz.timezone('US/Eastern')
+#     sunday_a_year_ago = datetime(today.year - 1, today.month, today.day - today.weekday())
+#     print(sunday_a_year_ago)
+#     return calendar.timegm(sunday_a_year_ago.timetuple())

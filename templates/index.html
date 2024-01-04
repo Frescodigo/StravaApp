@@ -2,26 +2,23 @@
 
 
 {% block body %}
-<h1>Welcome, {{ athlete["firstname"]}}</h1>
+<h1>Welcome, athlete</h1>
 <a href="/login">Sign out?</a>
 <section>
   <h2>Your activities</h2>
-  <ul>
+  <p id="waiting-box">Waiting for response from server</p>
+  <!-- <ul>
     {% for activity in activities %}
     <li>
       <article>
         <h3>{{ activity['name'] }}</h3>
-        <!-- DATE -->
         <time><p>{{ activity['start_date_local'] | time }}</p></time>
-        <!-- DISTANCE -->
         <p>{{ activity['distance'] | m_to_mi | round(2) }} mi</p>
-        <!-- PACE -->
-        <!-- DURATION -->
-        <!-- ELEVATION -->
       </article>
     </li>
     {% endfor %}
-  </ul>
+  </ul> -->
 </section>
-<script src="/static/goals.js"></script>
+<script>
+</script>
 {% endblock %}

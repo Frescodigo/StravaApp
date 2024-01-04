@@ -1,7 +1,7 @@
 import sqlite3
 from flask import Flask, jsonify, render_template, redirect, request, session, url_for
 from flask_session import Session
-from helpers import calc_objective, login_required, m_to_mi, human_readable_datetime, sunday_from_a_year_ago
+from helpers import calc_objective, login_required, m_to_mi, human_readable_datetime
 import os
 import requests
 
@@ -65,7 +65,7 @@ def index():
     # Download Activities from Strava's API
     activities = get_activities()
 
-    return render_template("index.html", athlete=athlete, activities=activities)
+    return render_template("index.html")
 
 
 # Log user in
@@ -91,13 +91,28 @@ def get_token():
 # Get user activities
 @app.route("/activities")
 @login_required
-def get_activities():
+def get_activities(after_timestamp = None):
     activities_url = "https://www.strava.com/api/v3/athlete/activities"
     header = {'Authorization': 'Bearer ' + session.get('user')['access_token']}
-    print(sunday_from_a_year_ago())
-    result = requests.get(activities_url, headers=header).json()
 
-    return [i for i in result if i['type'] == 'Run']  
+    activities = []
+    request_page_num = 1
+    per_page = 200
+    while True:
+        params = {'per_page': per_page, 'page': request_page_num, 'after': after_timestamp}
+        activity_request = requests.get(activities_url, headers=header, params=params).json()
+        activity_request = [activity for activity in activity_request if activity['type'] == 'Run']
+        
+        if activities:
+            activities.extend(activity_request)
+        else:
+            activities = activity_request
+
+        if len(activity_request) < per_page:
+            break
+
+        request_page_num += 1
+    return activities
 
 
 # Get athlete data
@@ -106,8 +121,12 @@ def get_activities():
 def get_athlete():
     athlete_url = "https://www.strava.com/api/v3/athlete"
     header = {'Authorization': 'Bearer ' + session.get('user')['access_token']}
-    result = requests.get(athlete_url, headers=header).json()
+    result = requests.get(athlete_url, headers=header)
+    print("*****************", result)
+    result = result.json()
+    print("#############:", result)
     return result
+
 
 if __name__ == '__main__':
     app.run(host=APP_IP, debug=True)  
