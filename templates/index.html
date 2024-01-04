@@ -7,18 +7,42 @@
 <section>
   <h2>Your activities</h2>
   <p id="waiting-box">Waiting for response from server</p>
-  <!-- <ul>
-    {% for activity in activities %}
-    <li>
-      <article>
-        <h3>{{ activity['name'] }}</h3>
-        <time><p>{{ activity['start_date_local'] | time }}</p></time>
-        <p>{{ activity['distance'] | m_to_mi | round(2) }} mi</p>
-      </article>
-    </li>
-    {% endfor %}
-  </ul> -->
+  <ul>
+
+  </ul>
 </section>
 <script>
+  // Returns the unix timestamp for the closest Sunday before one year ago
+  function startTimeStamp() {
+    const today = new Date()
+    const sundayAYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate() - today.getDay() + 1)
+    return sundayAYearAgo / 1000 // the "valueOf" a date object is milliseconds since epoch
+  }
+
+  async function getActivities() {
+    const timestamp = startTimeStamp()
+    const url = `{{ app_url }}/activities?timestamp=${timestamp}`
+    const response = await fetch(url)
+    const activities = await response.json()
+
+    return activities
+  }
+
+  async function updatePage() {
+    const activityList = document.querySelector('ul')
+
+    const activities = await getActivities()
+    activities.forEach(activity => {
+      const listItem = document.createElement('li')
+      listItem.innerHTML = activity['name']
+      activityList.appendChild(listItem)  
+    })
+
+    const waitingBox = document.getElementById('waiting-box')
+    waitingBox.innerHTML = ''
+  }
+
+  updatePage()
+
 </script>
 {% endblock %}

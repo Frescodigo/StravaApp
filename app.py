@@ -40,7 +40,7 @@ if not APP_IP:
 token_url = "https://www.strava.com/oauth/token"
 APP_URL = "http://" + APP_IP + ":5000"
 
-# Show run activity/goals if logged in, send to login otherwise
+# Show run activity/goals if logged in, send to login otherwise 
 @app.route("/")
 def index():
     if not session.get("authorization-code"):
@@ -59,13 +59,7 @@ def index():
     session['user']['access_token'] = res['access_token']
     session['user']['time_zone'] = res
 
-    # Get Athlete info from Strava's API
-    athlete = get_athlete()
-
-    # Download Activities from Strava's API
-    activities = get_activities()
-
-    return render_template("index.html")
+    return render_template("index.html", app_url=APP_URL)
 
 
 # Log user in
@@ -91,9 +85,13 @@ def get_token():
 # Get user activities
 @app.route("/activities")
 @login_required
-def get_activities(after_timestamp = None):
+def get_activities():
     activities_url = "https://www.strava.com/api/v3/athlete/activities"
     header = {'Authorization': 'Bearer ' + session.get('user')['access_token']}
+
+    after_timestamp = request.args.get('timestamp', 0)
+
+    print(after_timestamp)
 
     activities = []
     request_page_num = 1
@@ -101,7 +99,6 @@ def get_activities(after_timestamp = None):
     while True:
         params = {'per_page': per_page, 'page': request_page_num, 'after': after_timestamp}
         activity_request = requests.get(activities_url, headers=header, params=params).json()
-        activity_request = [activity for activity in activity_request if activity['type'] == 'Run']
         
         if activities:
             activities.extend(activity_request)
@@ -112,6 +109,8 @@ def get_activities(after_timestamp = None):
             break
 
         request_page_num += 1
+    
+    activities = [activity for activity in activities if activity['type'] == 'Run']
     return activities
 
 
