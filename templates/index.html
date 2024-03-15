@@ -2,47 +2,27 @@
 
 
 {% block body %}
-<h1>Welcome, athlete</h1>
+<h1>Welcome, {{ name }}</h1>
 <a href="/login">Sign out?</a>
 <section>
   <h2>Your activities</h2>
+  <div class='table-container'>
+  <table>
+    <thead id='table-head'>
+    </thead>
+    <tbody id='table-body'>
+    </tbody>
+  </table>
+  </div>
   <p id="waiting-box">Waiting for response from server</p>
-  <ul>
-
-  </ul>
 </section>
+
 <script>
-  // Returns the unix timestamp for the closest Sunday before one year ago
-  function startTimeStamp() {
-    const today = new Date()
-    const sundayAYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate() - today.getDay() + 1)
-    return sundayAYearAgo / 1000 // the "valueOf" a date object is milliseconds since epoch
-  }
-
-  async function getActivities() {
-    const timestamp = startTimeStamp()
-    const url = `{{ app_url }}/activities?timestamp=${timestamp}`
-    const response = await fetch(url)
-    const activities = await response.json()
-
-    return activities
-  }
-
-  async function updatePage() {
-    const activityList = document.querySelector('ul')
-
-    const activities = await getActivities()
-    activities.forEach(activity => {
-      const listItem = document.createElement('li')
-      listItem.innerHTML = activity['name']
-      activityList.appendChild(listItem)  
-    })
-
-    const waitingBox = document.getElementById('waiting-box')
-    waitingBox.innerHTML = ''
-  }
-
-  updatePage()
-
+  // constants from the server
+  const APP_URL = '{{ app_url }}';
 </script>
+
+<!-- I want client to query server for activities on startup based on client timezone -->
+<script src="../static/heatmap.js"></script>
+
 {% endblock %}

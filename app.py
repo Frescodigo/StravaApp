@@ -57,9 +57,9 @@ def index():
 
     res = requests.post(token_url, data=data).json()
     session['user']['access_token'] = res['access_token']
-    session['user']['time_zone'] = res
+    name = session['user']['athlete'].get('firstname', 'Champion')
 
-    return render_template("index.html", app_url=APP_URL)
+    return render_template("index.html", name=name, app_url=APP_URL)
 
 
 # Log user in
@@ -89,7 +89,7 @@ def get_activities():
     activities_url = "https://www.strava.com/api/v3/athlete/activities"
     header = {'Authorization': 'Bearer ' + session.get('user')['access_token']}
 
-    after_timestamp = request.args.get('timestamp', 0)
+    after_timestamp = request.args.get('cutoff', 0)
 
     print(after_timestamp)
 
