@@ -47,9 +47,10 @@ def human_readable_datetime(value):
 
 # Returns the date of sunday from a year ago in EPOCH
 # Sidenote: probably useless
-# def sunday_from_a_year_ago():
-#     today = datetime.today()
-#     timezone = pytz.timezone('US/Eastern')
-#     sunday_a_year_ago = datetime(today.year - 1, today.month, today.day - today.weekday())
-#     print(sunday_a_year_ago)
-#     return calendar.timegm(sunday_a_year_ago.timetuple())
+def sunday_from_a_year_ago():
+    today = datetime.today()
+    timezone = pytz.timezone('US/Eastern')
+    sunday_a_year_ago = datetime(today.year - 1, today.month, today.day - today.weekday())
+    print(sunday_a_year_ago)
+    return calendar.timegm(sunday_a_year_ago.timetuple())
+

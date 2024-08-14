@@ -1,4 +1,3 @@
-import sqlite3
 from flask import Flask, jsonify, render_template, redirect, request, session, url_for
 from flask_session import Session
 from helpers import calc_objective, login_required, m_to_mi, human_readable_datetime
@@ -10,14 +9,12 @@ app = Flask(__name__)
 app.jinja_env.filters['m_to_mi'] = m_to_mi
 app.jinja_env.filters['time'] = human_readable_datetime
 
-# Configure db
-db_con = sqlite3.connect("goals.db")
-db_cur = db_con.cursor()
 
 # Configure session
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
+
 
 # Configure environment variables 
 CLIENT_ID = os.environ.get("STRAVA_CLIENT_ID")
@@ -30,11 +27,11 @@ if not CLIENT_SECRET:
     print("Environment variable 'STRAVA_CLIENT_SECRET' not set")
     quit()
 
-# TODO: Get a real host address
 APP_IP = os.environ.get("STRAVA_APP_IP") # Debug only, I think
 if not APP_IP:
     print("Environment variable 'STRAVA_APP_IP' not set")
     quit()
+
 
 # API variables
 token_url = "https://www.strava.com/oauth/token"
@@ -67,6 +64,7 @@ def index():
 def login():
     session.clear()
     return render_template("login.html", app_url=APP_URL)
+
 
 # Generate an access token
 @app.route("/exchange_token")
